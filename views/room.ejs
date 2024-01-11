@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meeting Room 346</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="peerjs.min.js"></script>
+  <script src="peerjs.min.js.map"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <script src="jquery-3.5.1.min.js"></script>
+  <script src="bootstrap.min.js"></script>
+
+  <script>
+    const ROOM_ID = "<%= roomId %>";
+  </script>
+
+</head>
+
+<body>
+  <div id="peerid" style="display: none;"></div>
+  
+</div>
+  <br>
+  <div class="main">
+    <div class="main__left">
+
+
+      <div class="main__controls">
+        <div class="main__controls_center shadow p-3 mb-5 bg-white rounded">
+          <div class="main__controls_block">
+            <div class="main__controls_button">
+              <img alt="Avtar" src="avatar1.png" style="width: 40px; height: 40px;">
+              <div id="myname"></div>
+            </div>
+            
+          </div>
+
+          <div class="main__controls_block">
+            <div class="main__controls_button" id="muteButton" onclick="muteUnmute()">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-mic-fill" viewBox="0 0 16 16">
+                  <path d="M5 3a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0V3z" />
+                  <path
+                    d="M3.5 6.5A.5.5 0 0 1 4 7v1a4 4 0 0 0 8 0V7a.5.5 0 0 1 1 0v1a5 5 0 0 1-4.5 4.975V15h3a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1h3v-2.025A5 5 0 0 1 3 8V7a.5.5 0 0 1 .5-.5z" />
+                </svg>
+                Tắt âm thanh
+              </span>
+            </div>
+            <div class="main__controls_button" id="playPauseVideo" onclick="playStop()">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-camera-video-fill" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd"
+                    d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2V5z" />
+                </svg>
+                Tắt hình ảnh
+              </span>
+            </div>
+          </div>
+
+          <div class="main__controls_block">
+            
+            <div class="main__controls_button dropup">
+              <span class="dropbtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-people-fill" viewBox="0 0 16 16">
+                  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                  <path fill-rule="evenodd"
+                    d="M5.216 14A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216z" />
+                  <path d="M4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
+                </svg>
+                Danh sách
+              </span>
+              <div class="dropup-content shadow p-3 mb-5 bg-white rounded" id="listid">
+                <div id="items"></div>
+              </div>
+            </div>
+
+            <div class="main__controls_button" onclick="chatonoff1()">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" style="display:inline-block" class="bi bi-chat-left-dots-fill" viewBox="0 0 16 16">
+                  <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                </svg>
+                <span id="chatonoff" style="display:inline-block"></span>
+               
+              </span>
+             
+            </div>
+            
+            <div class="main__controls_button" onclick="getlink()">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z"/>
+                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                  <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+                </svg>
+                Lấy Room ID
+              </span>
+            </div>
+           
+          </div>
+
+          <div class="main__controls_block">
+            <div class="main__controls_button leaveMeeting" id="leave-meeting">
+              <span class="">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                  class="bi bi-x-square-fill" viewBox="0 0 16 16">
+                  <path
+                    d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm3.354 4.646L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708z" />
+                </svg>
+                Rời cuộc họp
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="main__videos">
+        <div class="toast">
+          <div class="toast-body" style="background-color: black; color: white;">
+            
+          </div>
+        </div>
+      </div>
+        <div id="video-grid"></div>
+      </div>
+     
+
+    <script src="script.js"></script>
+    <div class="main__right shadow p-3 mb-5 bg-white rounded" id="chatbox">
+      <div class="main__header">
+        <h6 <span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-chat-left-dots-fill" viewBox="0 0 16 16">
+            <path
+              d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" />
+          </svg>
+          Chat
+         
+        </span></h6>
+      </div>
+      <div class="main__chat__window" id="main__chat__window">
+        <ul class="messages" id="all_messages"></ul>
+      </div>
+      <div class="main__message_container">
+        <input type="text" id="chat_message" placeholder="Nhập nội dung chat..." />
+      </div>
+    </div>
+  </div>
+  
+
+
+  <div id="myModal" class="modal fade" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header  text-center">
+          <h5 class="modal-title w-100">Đăng nhập</h5>
+
+        </div>
+        <div class="modal-body">
+          <p>Nhập họ và tên để vào cuộc họp</p>
+
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Họ và tên" id="fullname">
+          </div>
+          <br>
+          <button type="submit" class="btn btn-primary" id="signin">Vào cuộc họp</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</body>
+
+</html>
